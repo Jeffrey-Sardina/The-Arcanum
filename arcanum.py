@@ -10,7 +10,6 @@ IMPORTS, CONSTANTS, AND GLOBALS
 '''
 # external imports
 import cv2 
-import sys
 import vlc
 import tkinter
 from PIL import Image, ImageOps, ImageTk
