@@ -1,26 +1,47 @@
 '''
 conda activate arcanum
+sudo apt-get install vlc
+'''
+
+'''
+===============================
+IMPORTS, CONSTANTS, AND GLOBALS
+===============================
 '''
 # external imports
 import cv2 
 import time
 import vlc
+import tkinter
+from PIL import Image, ImageOps, ImageTk
 
 # constants
 SAMPLING_FREQ_SECONDS = 0.25
 from spellbook import SPELLBOOK
 from spellbook import BARDIC_SPELL, COMMAND_SPELL, FORBIDDEN_SPELL, ILLUSION_SPELL
-SCRYING_EYE = cv2.VideoCapture(0) 
-QR_LOCATOR = cv2.QRCodeDetector()
+SCRYING_EYE = None
+QR_LOCATOR = None
+ILLUSION_ROOT = None
+ILLUSION_CANVAS = None
+CANVAS_W = None
+CANVAS_H = None
 
 # global vars
 bard = None
 current_music = None
 current_image = None
 
+
+'''
+=============
+MUSIC CONTROL
+=============
+'''
 def stop_music():
+    global current_music
     if bard:
         bard.stop()
+        current_music = None
 
 def play_music(music_file):
     global bard, current_music
@@ -31,47 +52,136 @@ def play_music(music_file):
     bard.play()
     current_music = music_file
 
+
+'''
+========================
+IMAGE (ILLUSION) CONTROL
+========================
+'''
+def prep_image(image_file):
+    image = Image.open(image_file)
+    base_w, base_h = image.size
+    img_ratio = base_w / base_h
+    screen_ratio = CANVAS_W / CANVAS_H
+    tolerance = 0.001
+    if screen_ratio - img_ratio > tolerance:
+        # see which dim needs to scale less (to avoid the other one getting too big)
+        change_ratio_w = CANVAS_W / base_w
+        change_ratio_h = CANVAS_H / base_h
+        scale_ratio = min(change_ratio_w, change_ratio_h)
+
+        # get new dims with that scaling
+        new_w = int(base_w * scale_ratio)
+        new_h = int(base_h * scale_ratio)
+        image = image.resize((new_w, new_h), Image.Resampling.LANCZOS)
+
+        # pad to desired screen size
+        if new_w < CANVAS_W:
+            diff_w = CANVAS_W - new_w
+            pad_lat = diff_w // 2
+        else:
+            pad_lat = 0
+        if new_h < CANVAS_H:
+            diff_h = CANVAS_H - new_h
+            pad_top = diff_h // 2
+        else:
+            pad_top = 0
+        padding = (pad_lat, pad_top, pad_lat, pad_top)
+        ImageOps.expand(image, padding)
+    else:
+        # rescale to fix correct pixel size
+        image = image.resize((CANVAS_W, CANVAS_H), Image.Resampling.LANCZOS)
+    image = ImageTk.PhotoImage(image)
+    return image
+
 def stop_illusion(image_file):
-    pass
+    global current_image
+    image = prep_image(image_file)
+    show_illusion(image)
+    current_image = None
 
 def show_illusion(image_file):
     global current_image
     if image_file == current_image:
         return # dont replay what we already started playing
-    stop_illusion()
-    # ...
+    # https://www.tutorialspoint.com/how-to-update-an-image-in-a-tkinter-canvas
+    image = prep_image(image_file)
+    show_illusion(image)
+    ILLUSION_CANVAS.itemconfig(ILLUSION_CONTAINER, image=image)
     current_image = image_file
 
+
+'''
+======================
+ARCANUM CORE FUNCTIONS
+======================
+'''
 def exit_arcanum():
-    SCRYING_EYE.release() 
+    if SCRYING_EYE:
+        try:
+            SCRYING_EYE.release()
+        except:
+            pass
+    if ILLUSION_ROOT:
+        try:
+            ILLUSION_ROOT.destroy()
+        except:
+            pass
     exit(0)
 
+def setup_arcanum():
+    global SCRYING_EYE, QR_LOCATOR, ILLUSION_ROOT, ILLUSION_CANVAS, CANVAS_W, CANVAS_H, ILLUSION_CONTAINER
+
+    # for vision
+    SCRYING_EYE = cv2.VideoCapture(0) 
+    QR_LOCATOR = cv2.QRCodeDetector()
+
+    # for images; ref: https://stackoverflow.com/questions/47316266/can-i-display-image-in-full-screen-mode-with-pil
+    ILLUSION_ROOT = tkinter.Tk()
+    ILLUSION_ROOT.bind("<Escape>", lambda e: (e.widget.withdraw(), e.widget.quit()))
+    CANVAS_W = ILLUSION_ROOT.winfo_screenwidth()
+    CANVAS_H = ILLUSION_ROOT.winfo_screenheight()
+    ILLUSION_ROOT.attributes("-fullscreen", True) 
+    ILLUSION_ROOT.geometry("%dx%d+0+0" % (CANVAS_W, CANVAS_H))
+    ILLUSION_ROOT.focus_set()    
+    ILLUSION_CANVAS = tkinter.Canvas(ILLUSION_ROOT, width=CANVAS_W, height=CANVAS_H)
+    ILLUSION_CANVAS.pack()
+    ILLUSION_CANVAS.configure(background='black')
+
+    # display default null image
+    image = prep_image('images/black.png')
+    ILLUSION_CONTAINER = ILLUSION_CANVAS.create_image(CANVAS_W / 2, CANVAS_H / 2,image=image)
+
+def arcanum_loop():
+    _, img = SCRYING_EYE.read()
+    qr_value, _, _ = QR_LOCATOR.detectAndDecode(img) 
+    if qr_value and qr_value in SPELLBOOK: 
+        spell = SPELLBOOK[qr_value]
+        spell_data = spell.spell_data
+        spell_type = spell.spell_type
+        print(spell_data)
+
+        if spell_type == BARDIC_SPELL:
+            play_music(spell_data)
+        elif spell_type == COMMAND_SPELL:
+            spell()
+        elif spell_type == FORBIDDEN_SPELL:
+            if spell_data == 'stop-illusion':
+                stop_illusion()
+            elif spell_data == 'stop-music':
+                stop_music()
+            elif spell_data == 'exit':
+                exit_arcanum()
+        elif spell_type == ILLUSION_SPELL:
+            show_illusion(spell_data)
+        else:
+            assert False, f"unknown spell type: {spell_type}; data: {spell_data}"
+    ILLUSION_ROOT.after(int(SAMPLING_FREQ_SECONDS * 1000), arcanum_loop)
+
 def enter_arcanum():
-    while True: 
-        _, img = SCRYING_EYE.read()
-        qr_value, _, _ = QR_LOCATOR.detectAndDecode(img) 
-        if qr_value and qr_value in SPELLBOOK: 
-            spell = SPELLBOOK[qr_value]
-            spell_data = spell.spell_data
-            spell_type = spell.spell_type
-
-            if spell_type == BARDIC_SPELL:
-                play_music(spell_data)
-            elif spell_type == COMMAND_SPELL:
-                spell()
-            elif spell_type == FORBIDDEN_SPELL:
-                if spell_data == 'stop-illusion':
-                    stop_illusion()
-                elif spell_data == 'stop-music':
-                    stop_music()
-                elif spell_data == 'exit':
-                    exit_arcanum()
-            elif spell_type == ILLUSION_SPELL:
-                show_illusion(spell_data)
-            else:
-                assert False, f"unknown spell type: {spell_type}; data: {spell_data}"
-
-        time.sleep(SAMPLING_FREQ_SECONDS)
+    setup_arcanum()
+    ILLUSION_ROOT.after(int(SAMPLING_FREQ_SECONDS * 1000), arcanum_loop)
+    ILLUSION_ROOT.mainloop()
   
 if __name__ == '__main__':
     enter_arcanum()

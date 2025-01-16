@@ -1,8 +1,11 @@
 # musio
-*.mp3
-*.wav
+music/*
+
 
 # images
-*.jpg
-*.jpeg
-*.png
+images/*
+
+# ignore ignore
+!.init
+!images/black.png
+

@@ -23,8 +23,12 @@ hello_world = Spell(
 )
 
 SPELLBOOK = {
-    'stop-music': 'stop-music',
-    'stop-illusion': 'stop-illusion',
-    'exit': 'exit',
-    '1': hello_world
+    'stop-music': Spell('stop-music', FORBIDDEN_SPELL),
+    'stop-illusion': Spell('stop-illusion', FORBIDDEN_SPELL),
+    'exit': Spell('exit', FORBIDDEN_SPELL),
+    'hello': hello_world,
+
+    '0': Spell('images/elden.webp', ILLUSION_SPELL),
+    '1': Spell('images/bg3.webp', ILLUSION_SPELL),
+    '2': Spell('music/bg3.mp3', BARDIC_SPELL)
 }
