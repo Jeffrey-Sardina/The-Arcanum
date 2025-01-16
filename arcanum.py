@@ -152,7 +152,7 @@ def arcanum_loop():
             assert False, f"unknown spell type: {spell_type}; data: {spell_data}"
     ILLUSION_ROOT.after(int(SAMPLING_FREQ_SECONDS * 1000), arcanum_loop)
 
-def enter_arcanum(camera_id):
+def enter_arcanum():
     global QR_LOCATOR, ILLUSION_ROOT, ILLUSION_CANVAS, CANVAS_W, CANVAS_H, ILLUSION_CONTAINER
 
     # for vision
