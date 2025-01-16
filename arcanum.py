@@ -1,9 +1,4 @@
 '''
-conda activate arcanum
-sudo apt-get install vlc
-'''
-
-'''
 ===============================
 IMPORTS, CONSTANTS, AND GLOBALS
 ===============================
