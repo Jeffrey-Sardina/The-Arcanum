@@ -21,6 +21,9 @@ In all cases, default I/O is used -- so any of the above can we swapped out as l
 
 I'm using Python 3.7 for legacy use (my RaspBerry Pi is way out of date) -- but this code should run on basically any Python 3. I'm trying to keep OS-specific stuff out as well, so hopefully your OS of choice will not matter.
 
+## Finding your Camera ID
+If you have multiple webcams and want to choose which one to use, see here: https://stackoverflow.com/questions/57577445/list-available-cameras-opencv-python
+
 ## Requirements
 You'll need to run `pip install -r requirements.txt'`.
 

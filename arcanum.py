@@ -10,16 +10,14 @@ IMPORTS, CONSTANTS, AND GLOBALS
 '''
 # external imports
 import cv2 
-import time
+import sys
 import vlc
 import tkinter
 from PIL import Image, ImageOps, ImageTk
 
-# constants
-SAMPLING_FREQ_SECONDS = 0.25
+# constants (that you don't need to change)
 from spellbook import SPELLBOOK
 from spellbook import BARDIC_SPELL, COMMAND_SPELL, FORBIDDEN_SPELL, ILLUSION_SPELL
-SCRYING_EYE = None
 QR_LOCATOR = None
 ILLUSION_ROOT = None
 ILLUSION_CANVAS = None
@@ -155,11 +153,10 @@ def arcanum_loop():
             assert False, f"unknown spell type: {spell_type}; data: {spell_data}"
     ILLUSION_ROOT.after(int(SAMPLING_FREQ_SECONDS * 1000), arcanum_loop)
 
-def enter_arcanum():
-    global SCRYING_EYE, QR_LOCATOR, ILLUSION_ROOT, ILLUSION_CANVAS, CANVAS_W, CANVAS_H, ILLUSION_CONTAINER
+def enter_arcanum(camera_id):
+    global QR_LOCATOR, ILLUSION_ROOT, ILLUSION_CANVAS, CANVAS_W, CANVAS_H, ILLUSION_CONTAINER
 
     # for vision
-    SCRYING_EYE = cv2.VideoCapture(0) 
     QR_LOCATOR = cv2.QRCodeDetector()
 
     # for images; ref: https://stackoverflow.com/questions/47316266/can-i-display-image-in-full-screen-mode-with-pil
@@ -187,6 +184,13 @@ def enter_arcanum():
     ILLUSION_ROOT.after(int(SAMPLING_FREQ_SECONDS * 1000), arcanum_loop)
     ILLUSION_ROOT.mainloop()
 
-  
-if __name__ == '__main__':
+def process_args():
     enter_arcanum()
+
+if __name__ == '__main__':
+    # things the user may want to change
+    SCRYING_EYE = cv2.VideoCapture(2) # cannot be in func for some reason
+    SAMPLING_FREQ_SECONDS = 0.25
+
+    # start program
+    process_args()

@@ -4,6 +4,8 @@ music/*
 # images
 images/*
 
+find_camera.py
+
 # ignore ignore
 !.init
 !images/black.png
