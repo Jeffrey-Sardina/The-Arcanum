@@ -8,10 +8,11 @@ import cv2
 import vlc
 import tkinter
 from PIL import Image, ImageOps, ImageTk
+import sys
 
 # constants (that you don't need to change)
 from spellbook import SPELLBOOK
-from spellbook import BARDIC_SPELL, COMMAND_SPELL, FORBIDDEN_SPELL, ILLUSION_SPELL
+from spellbook import BARDIC_SPELL, FORBIDDEN_SPELL, ILLUSION_SPELL
 QR_LOCATOR = None
 ILLUSION_ROOT = None
 ILLUSION_CANVAS = None
@@ -132,8 +133,6 @@ def arcanum_loop():
 
         if spell_type == BARDIC_SPELL:
             play_music(spell_data)
-        elif spell_type == COMMAND_SPELL:
-            spell()
         elif spell_type == FORBIDDEN_SPELL:
             if spell_data == 'stop-illusion':
                 stop_illusion()
@@ -180,8 +179,18 @@ def enter_arcanum():
 
 if __name__ == '__main__':
     # things the user may want to change
-    SCRYING_EYE = cv2.VideoCapture(2) # cannot be in func for some reason
-    SAMPLING_FREQ_SECONDS = 0.25
+    try:
+        cam_id = int(sys.argv[1])
+        sampling_freq = sys.argv[2]
+        SCRYING_EYE = cv2.VideoCapture(0) # cannot be in func for some reason
+        SAMPLING_FREQ_SECONDS = float(sampling_freq)
+    except:
+        print('Error: invalid usage')
+        print('Usage')
+        print('python arcanum.py CAMERA_ID SAMPLE_RATE')
+        print('If you are unsure, here are the recommended values:')
+        print('python arcanum.py 0 0.25')
+        exit(1)
 
     # start program
     enter_arcanum()
