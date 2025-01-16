@@ -92,6 +92,7 @@ def prep_image(image_file):
         # rescale to fix correct pixel size
         image = image.resize((CANVAS_W, CANVAS_H), Image.Resampling.LANCZOS)
     image = ImageTk.PhotoImage(image)
+    ILLUSION_ROOT.im = image # to avoid GC issues; see: https://stackoverflow.com/questions/57049722/unable-to-update-image-in-tkinter-using-a-function
     return image
 
 def stop_illusion(image_file):
@@ -101,12 +102,11 @@ def stop_illusion(image_file):
     current_image = None
 
 def show_illusion(image_file):
-    global current_image
+    global current_image, ILLUSION_CONTAINER
     if image_file == current_image:
-        return # dont replay what we already started playing
+        return # dont redraw what we already are showing
     # https://www.tutorialspoint.com/how-to-update-an-image-in-a-tkinter-canvas
     image = prep_image(image_file)
-    show_illusion(image)
     ILLUSION_CANVAS.itemconfig(ILLUSION_CONTAINER, image=image)
     current_image = image_file
 
@@ -128,29 +128,6 @@ def exit_arcanum():
         except:
             pass
     exit(0)
-
-def setup_arcanum():
-    global SCRYING_EYE, QR_LOCATOR, ILLUSION_ROOT, ILLUSION_CANVAS, CANVAS_W, CANVAS_H, ILLUSION_CONTAINER
-
-    # for vision
-    SCRYING_EYE = cv2.VideoCapture(0) 
-    QR_LOCATOR = cv2.QRCodeDetector()
-
-    # for images; ref: https://stackoverflow.com/questions/47316266/can-i-display-image-in-full-screen-mode-with-pil
-    ILLUSION_ROOT = tkinter.Tk()
-    ILLUSION_ROOT.bind("<Escape>", lambda e: (e.widget.withdraw(), e.widget.quit()))
-    CANVAS_W = ILLUSION_ROOT.winfo_screenwidth()
-    CANVAS_H = ILLUSION_ROOT.winfo_screenheight()
-    ILLUSION_ROOT.attributes("-fullscreen", True) 
-    ILLUSION_ROOT.geometry("%dx%d+0+0" % (CANVAS_W, CANVAS_H))
-    ILLUSION_ROOT.focus_set()    
-    ILLUSION_CANVAS = tkinter.Canvas(ILLUSION_ROOT, width=CANVAS_W, height=CANVAS_H)
-    ILLUSION_CANVAS.pack()
-    ILLUSION_CANVAS.configure(background='black')
-
-    # display default null image
-    image = prep_image('images/black.png')
-    ILLUSION_CONTAINER = ILLUSION_CANVAS.create_image(CANVAS_W / 2, CANVAS_H / 2,image=image)
 
 def arcanum_loop():
     _, img = SCRYING_EYE.read()
@@ -179,9 +156,37 @@ def arcanum_loop():
     ILLUSION_ROOT.after(int(SAMPLING_FREQ_SECONDS * 1000), arcanum_loop)
 
 def enter_arcanum():
-    setup_arcanum()
+    global SCRYING_EYE, QR_LOCATOR, ILLUSION_ROOT, ILLUSION_CANVAS, CANVAS_W, CANVAS_H, ILLUSION_CONTAINER
+
+    # for vision
+    SCRYING_EYE = cv2.VideoCapture(0) 
+    QR_LOCATOR = cv2.QRCodeDetector()
+
+    # for images; ref: https://stackoverflow.com/questions/47316266/can-i-display-image-in-full-screen-mode-with-pil
+    ILLUSION_ROOT = tkinter.Tk()
+    ILLUSION_ROOT.bind("<Escape>", lambda e: (e.widget.withdraw(), e.widget.quit()))
+    CANVAS_W = ILLUSION_ROOT.winfo_screenwidth()
+    CANVAS_H = ILLUSION_ROOT.winfo_screenheight()
+    ILLUSION_ROOT.attributes("-fullscreen", True) 
+    ILLUSION_ROOT.geometry("%dx%d+0+0" % (CANVAS_W, CANVAS_H))
+    ILLUSION_ROOT.focus_set()    
+    ILLUSION_CANVAS = tkinter.Canvas(
+        ILLUSION_ROOT,
+        width=CANVAS_W,
+        height=CANVAS_H,
+        bg='green'
+    )
+    ILLUSION_CANVAS.pack(anchor=tkinter.CENTER)
+
+    # display default null image
+    image = prep_image('images/black.png')
+    ILLUSION_CONTAINER = ILLUSION_CANVAS.create_image(
+        (CANVAS_W // 2, CANVAS_H // 2),
+        image=image
+    )
     ILLUSION_ROOT.after(int(SAMPLING_FREQ_SECONDS * 1000), arcanum_loop)
     ILLUSION_ROOT.mainloop()
+
   
 if __name__ == '__main__':
     enter_arcanum()

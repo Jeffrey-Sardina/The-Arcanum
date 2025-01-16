@@ -1,11 +1,9 @@
 # musio
 music/*
 
-
 # images
 images/*
 
 # ignore ignore
 !.init
 !images/black.png
-

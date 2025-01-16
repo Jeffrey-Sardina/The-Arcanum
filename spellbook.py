@@ -28,7 +28,6 @@ SPELLBOOK = {
     'exit': Spell('exit', FORBIDDEN_SPELL),
     'hello': hello_world,
 
-    '0': Spell('images/elden.webp', ILLUSION_SPELL),
-    '1': Spell('images/bg3.webp', ILLUSION_SPELL),
+    '1': Spell('images/blue.png', ILLUSION_SPELL),
     '2': Spell('music/bg3.mp3', BARDIC_SPELL)
 }
