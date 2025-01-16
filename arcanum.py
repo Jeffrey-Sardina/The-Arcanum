@@ -183,13 +183,10 @@ def enter_arcanum():
     ILLUSION_ROOT.after(int(SAMPLING_FREQ_SECONDS * 1000), arcanum_loop)
     ILLUSION_ROOT.mainloop()
 
-def process_args():
-    enter_arcanum()
-
 if __name__ == '__main__':
     # things the user may want to change
     SCRYING_EYE = cv2.VideoCapture(2) # cannot be in func for some reason
     SAMPLING_FREQ_SECONDS = 0.25
 
     # start program
-    process_args()
+    enter_arcanum()
