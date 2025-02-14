@@ -25,6 +25,7 @@ bard = None
 bard_layered = None
 current_music = None
 current_music_layered = None
+music_queue = None
 current_image = None
 
 
@@ -145,9 +146,15 @@ def exit_arcanum():
     exit(0)
 
 def arcanum_loop():
+    global music_queue
     try:
         if bard and bard.get_state() == 6: #ended
-            stop_music(streams=TAG_STANDARD) #do a reset
+            if len(music_queue) > 0:
+                next_music = music_queue[0]
+                play_music(next_music, tag=TAG_STANDARD)
+                music_queue = music_queue[1:]
+            else:
+                stop_music(streams=TAG_STANDARD) #do a reset
         
         if bard_layered and bard_layered.get_state() == 6: #ended
             stop_music(streams=TAG_MUSIC_LAYERED) #do a reset
@@ -162,8 +169,14 @@ def arcanum_loop():
                 spell_tag = spell.tag
                 print(spell_data)
 
+                # music
                 if spell_type == BARDIC_SPELL:
-                    play_music(spell_data, tag=spell_tag)
+                    first_music = spell_data[0]
+                    play_music(first_music, tag=spell_tag)
+                    if spell_tag == TAG_STANDARD:
+                        music_queue = spell_data[1:]
+
+                # arcanum commands
                 elif spell_type == FORBIDDEN_SPELL:
                     if spell_data == 'stop-illusion':
                         stop_illusion()
@@ -171,8 +184,12 @@ def arcanum_loop():
                         stop_music()
                     elif spell_data == 'exit':
                         exit_arcanum()
+            
+                # images
                 elif spell_type == ILLUSION_SPELL:
                     show_illusion(spell_data)
+
+                # error handling
                 else:
                     assert False, f"unknown spell type: {spell_type}; data: {spell_data}"
             else:
@@ -217,6 +234,7 @@ def enter_arcanum():
     ILLUSION_ROOT.mainloop()
 
 if __name__ == '__main__':
+    debug = False
     try:
         # command line args
         cam_id = int(sys.argv[1])
