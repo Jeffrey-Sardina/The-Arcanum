@@ -13,6 +13,7 @@ import sys
 # constants (that you don't need to change)
 from spellbook import SPELLBOOK
 from spellbook import BARDIC_SPELL, FORBIDDEN_SPELL, ILLUSION_SPELL
+from spellbook import TAG_STANDARD, TAG_MUSIC_LAYERED
 QR_LOCATOR = None
 ILLUSION_ROOT = None
 ILLUSION_CANVAS = None
@@ -21,7 +22,9 @@ CANVAS_H = None
 
 # global vars
 bard = None
+bard_layered = None
 current_music = None
+current_music_layered = None
 current_image = None
 
 
@@ -30,20 +33,39 @@ current_image = None
 MUSIC CONTROL
 =============
 '''
-def stop_music():
-    global current_music
-    if bard:
-        bard.stop()
-        current_music = None
+def stop_music(streams="All"):
+    '''
+    If only standard is true, only music being played with the standard tag will be stopped
+    '''
+    global current_music, current_music_layered
 
-def play_music(music_file):
-    global bard, current_music
-    if music_file == current_music:
-        return # dont replay what we already started playing
-    stop_music()
-    bard = vlc.MediaPlayer(music_file)
-    bard.play()
-    current_music = music_file
+    if TAG_STANDARD in streams or streams == "All":
+        current_music = None
+        if bard:
+            bard.stop()
+
+    if TAG_MUSIC_LAYERED in streams or streams == "All":
+        current_music_layered = None
+        if bard_layered:
+            bard_layered.stop()
+
+def play_music(music_file, tag=TAG_STANDARD):
+    global bard, bard_layered, current_music, current_music_layered
+    
+    if tag == TAG_STANDARD:
+        if music_file == current_music:
+            return # dont replay what we already started playing
+        stop_music(streams=TAG_STANDARD)
+        bard = vlc.MediaPlayer(music_file)
+        bard.play()
+        current_music = music_file
+    else:
+        if music_file == current_music_layered:
+            return # dont replay what we already started playing
+        stop_music(streams=TAG_MUSIC_LAYERED)
+        bard_layered = vlc.MediaPlayer(music_file)
+        bard_layered.play()
+        current_music_layered = music_file 
 
 
 '''
@@ -123,28 +145,45 @@ def exit_arcanum():
     exit(0)
 
 def arcanum_loop():
-    _, img = SCRYING_EYE.read()
-    qr_value, _, _ = QR_LOCATOR.detectAndDecode(img) 
-    if qr_value and qr_value in SPELLBOOK: 
-        spell = SPELLBOOK[qr_value]
-        spell_data = spell.spell_data
-        spell_type = spell.spell_type
-        print(spell_data)
+    try:
+        if bard and bard.get_state() == 6: #ended
+            stop_music(streams=TAG_STANDARD) #do a reset
+        
+        if bard_layered and bard_layered.get_state() == 6: #ended
+            stop_music(streams=TAG_MUSIC_LAYERED) #do a reset
 
-        if spell_type == BARDIC_SPELL:
-            play_music(spell_data)
-        elif spell_type == FORBIDDEN_SPELL:
-            if spell_data == 'stop-illusion':
-                stop_illusion()
-            elif spell_data == 'stop-music':
-                stop_music()
-            elif spell_data == 'exit':
-                exit_arcanum()
-        elif spell_type == ILLUSION_SPELL:
-            show_illusion(spell_data)
+        _, img = SCRYING_EYE.read()
+        qr_value, _, _ = QR_LOCATOR.detectAndDecode(img)
+        if qr_value:
+            if qr_value in SPELLBOOK: 
+                spell = SPELLBOOK[qr_value]
+                spell_data = spell.spell_data
+                spell_type = spell.spell_type
+                spell_tag = spell.tag
+                print(spell_data)
+
+                if spell_type == BARDIC_SPELL:
+                    play_music(spell_data, tag=spell_tag)
+                elif spell_type == FORBIDDEN_SPELL:
+                    if spell_data == 'stop-illusion':
+                        stop_illusion()
+                    elif spell_data == 'stop-music':
+                        stop_music()
+                    elif spell_data == 'exit':
+                        exit_arcanum()
+                elif spell_type == ILLUSION_SPELL:
+                    show_illusion(spell_data)
+                else:
+                    assert False, f"unknown spell type: {spell_type}; data: {spell_data}"
+            else:
+                print(f'Found QR value {qr_value}, but it is not mapped to a spell')
+        ILLUSION_ROOT.after(int(SAMPLING_FREQ_SECONDS * 1000), arcanum_loop)
+    except:
+        if debug:
+            raise
         else:
-            assert False, f"unknown spell type: {spell_type}; data: {spell_data}"
-    ILLUSION_ROOT.after(int(SAMPLING_FREQ_SECONDS * 1000), arcanum_loop)
+            print('ERROR')
+            exit_arcanum()
 
 def enter_arcanum():
     global QR_LOCATOR, ILLUSION_ROOT, ILLUSION_CANVAS, CANVAS_W, CANVAS_H, ILLUSION_CONTAINER
@@ -178,18 +217,21 @@ def enter_arcanum():
     ILLUSION_ROOT.mainloop()
 
 if __name__ == '__main__':
-    # things the user may want to change
     try:
+        # command line args
         cam_id = int(sys.argv[1])
-        sampling_freq = sys.argv[2]
-        SCRYING_EYE = cv2.VideoCapture(0) # cannot be in func for some reason
+        if "-db" in sys.argv:
+            debug = True
+
+        sampling_freq = 0.01
+        SCRYING_EYE = cv2.VideoCapture(cam_id) # cannot be in func for some reason
         SAMPLING_FREQ_SECONDS = float(sampling_freq)
     except:
         print('Error: invalid usage')
-        print('Usage')
-        print('python arcanum.py CAMERA_ID SAMPLE_RATE')
-        print('If you are unsure, here are the recommended values:')
-        print('python arcanum.py 0 0.25')
+        print('Usage:')
+        print('python arcanum.py CAMERA_ID')
+        print('If you do not know the ID of your camera, the built-in (or only) webcame is 0.')
+        print('To find the IDs of other webcame (which may not be sequential), use find_camera.py')
         exit(1)
 
     # start program

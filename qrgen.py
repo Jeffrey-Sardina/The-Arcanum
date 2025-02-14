@@ -4,7 +4,7 @@ import sys
 if __name__ == '__main__':
     # get user data
     text = sys.argv[1]
-    filename = sys.argv[2]
+    filename = text + '.png'
 
     # get file format
     ext = filename.split('.')[-1].lower()
