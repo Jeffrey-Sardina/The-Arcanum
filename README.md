@@ -18,14 +18,21 @@ In all cases, default I/O is used -- so any of the above can we swapped out as l
 
 
 ## Using the Arcanum
-right now, you only have to care about 2 things:
-- command-line args for `arcanum.py`. These are the ID of your webcam (if you only have one webcam, it's 0) and the sampling rate. By default, 0 and 0.25 respectively are good defaults. That means you can run this as `python arcanum.py 0 0.25` in almost all use cases.
-- hard-coded actions in `spellbook.py`. These are called "Spells" and are created using the `Spell` class (examples are given in that file). The Spellbook maps text to some sort of action -- note that the text is the value read off the QR code by the camera! There are three types of spells: 
+Right now, you only have to care about 2 things:
+
+Command-line args for `arcanum.py`. These are the ID of your webcam (if you only have one webcam, it's 0) and the sampling rate. By default, 0 and 0.25 respectively are good defaults. That means you can run this as `python arcanum.py 0 0.25` in almost all use cases.
+
+Hard-coded actions in `spellbook.py`. These are called "Spells" and are created using the `Spell` class (examples are given in that file). The Spellbook maps text to some sort of action -- note that the text is the value read off the QR code by the camera! There are three types of spells: 
     - FORBIDDEN_SPELL -- these are ones I use for special purposes (like closing the program). THere should be no need for you to never change them, though you might want to create QR codes for them.
     - BARDIC_SPELL -- contains a path to a music file. That file will be played if this command is given. This file must be on your computer (not, for example, on youtube -- for the moment at least).
     - ILLUSION_SPELL -- contains a path to an image file. That file will be displayed if this command is given. This file must be on your computer, not a link to a file online.
 
-Define all the mappings you wan, run Arcanum, and there you go! Just show it QR codes for each of your spells, and it will "cast" them for you!
+You may also want to tag a spell with TAG_MUSIC_LAYERED to play it as a sound effect. Music played this way
+- does not repeat (most music will by default)
+- can be played at the same time as "regular" music
+- is intended to be mainly used for sound effects (like a door closing), but can be used for anything you'd like!
+
+Define all the mappings you want, run Arcanum, and there you go! Just show it QR codes for each of your spells, and it will "cast" them for you!
 
 
 ## Finding your Camera ID

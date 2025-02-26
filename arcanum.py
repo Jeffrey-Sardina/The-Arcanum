@@ -12,10 +12,11 @@ import tkinter
 from PIL import Image, ImageOps, ImageTk
 import sys
 
-# constants (that you don't need to change)
+# internal imports
+from spell import *
 from spellbook import SPELLBOOK
-from spellbook import BARDIC_SPELL, FORBIDDEN_SPELL, ILLUSION_SPELL
-from spellbook import TAG_STANDARD, TAG_MUSIC_LAYERED
+
+# constants (that you don't need to change)
 QR_LOCATOR = None
 ILLUSION_ROOT = None
 ILLUSION_CANVAS = None
@@ -148,7 +149,7 @@ def exit_arcanum():
     exit(0)
 
 def arcanum_loop():
-    global music_queue
+    global music_queue, current_music
     try:
         if bard and bard.get_state() == 6: #ended
             if len(music_queue) > 0:
@@ -156,7 +157,9 @@ def arcanum_loop():
                 play_music(next_music, tag=TAG_STANDARD)
                 music_queue = music_queue[1:]
             else:
-                play_music(current_music, tag=TAG_STANDARD) # repeat
+                next_music = current_music
+                current_music = None
+                play_music(next_music, tag=TAG_STANDARD) # repeat
         
         if bard_layered and bard_layered.get_state() == 6: #ended
             stop_music(streams=TAG_MUSIC_LAYERED) #do a reset
