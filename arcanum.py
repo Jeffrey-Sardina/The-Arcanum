@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 '''
 ===============================
 IMPORTS, CONSTANTS, AND GLOBALS
@@ -154,7 +156,7 @@ def arcanum_loop():
                 play_music(next_music, tag=TAG_STANDARD)
                 music_queue = music_queue[1:]
             else:
-                stop_music(streams=TAG_STANDARD) #do a reset
+                play_music(current_music, tag=TAG_STANDARD) # repeat
         
         if bard_layered and bard_layered.get_state() == 6: #ended
             stop_music(streams=TAG_MUSIC_LAYERED) #do a reset
