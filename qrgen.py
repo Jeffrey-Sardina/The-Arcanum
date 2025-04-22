@@ -6,7 +6,12 @@ import sys
 if __name__ == '__main__':
     # get user data
     text = sys.argv[1]
-    filename = text + '.png'
+    try:
+        out_name = sys.argv[2]
+        filename = out_name + '.png'
+    except:
+        filename = text + '.png'
+
 
     # get file format
     ext = filename.split('.')[-1].lower()
