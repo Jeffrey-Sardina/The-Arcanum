@@ -4,7 +4,7 @@ import cv2
 """
 Based on: https://stackoverflow.com/questions/57577445/list-available-cameras-opencv-python
 """
-if __name__ == '__main__':
+def find_working_ids():
     working_ids = []
     for id_to_test in range(100): # I think these only go up to 99?
         id_works = True
@@ -22,10 +22,14 @@ if __name__ == '__main__':
         if not is_reading:
             id_works = False
 
-        # print ID if it works
+        # save ID if it works
         if id_works:
             working_ids.append(id_to_test)
 
+        return working_ids
+
+if __name__ == '__main__':
+    working_ids = find_working_ids()
     print()
     print('ERROR / WARN messages above are ok to ignore')
     print('Working camera IDs:')

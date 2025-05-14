@@ -15,6 +15,7 @@ import sys
 # internal imports
 from spell import *
 from spellbook import SPELLBOOK
+from find_camera import find_working_ids
 
 # constants (that you don't need to change)
 QR_LOCATOR = None
@@ -242,7 +243,17 @@ if __name__ == '__main__':
     debug = False
     try:
         # command line args
-        cam_id = int(sys.argv[1])
+        try:
+            cam_id = int(sys.argv[1])
+        except:
+            print('No camera found. Attempting a scan to find a connected camera')
+            working_ids = find_working_ids()
+            if len(working_ids) == 1:
+                cam_id = working_ids[0]
+            else:
+                print('More than one camera found, unsure which to use. Please specify.')
+                print(f'Working camera ids are: {working_ids}')
+                raise
         if "-db" in sys.argv:
             debug = True
 
