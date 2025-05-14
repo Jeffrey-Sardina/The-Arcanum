@@ -166,7 +166,10 @@ def arcanum_loop():
             stop_music(streams=TAG_MUSIC_LAYERED) #do a reset
 
         _, img = SCRYING_EYE.read()
-        qr_value, _, _ = QR_LOCATOR.detectAndDecode(img)
+        try:
+            qr_value, _, _ = QR_LOCATOR.detectAndDecodeCurved(img)
+        except:
+            qr_value = False
         if qr_value:
             if qr_value in SPELLBOOK: 
                 spell = SPELLBOOK[qr_value]
