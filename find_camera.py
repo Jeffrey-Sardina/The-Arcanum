@@ -32,5 +32,7 @@ if __name__ == '__main__':
     working_ids = find_working_ids()
     print()
     print('ERROR / WARN messages above are ok to ignore')
+
+    print('=' * 42)
     print('Working camera IDs:')
     print(working_ids)

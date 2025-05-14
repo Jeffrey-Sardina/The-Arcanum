@@ -265,7 +265,7 @@ if __name__ == '__main__':
         print('Usage:')
         print('python arcanum.py CAMERA_ID')
         print('If you do not know the ID of your camera, the built-in (or only) webcame is 0.')
-        print('To find the IDs of other webcame (which may not be sequential), use find_camera.py')
+        print('To find the IDs of other webcams (which may not be sequential), use find_camera.py or see the details printed above')
         exit(1)
 
     # start program
