@@ -12,7 +12,7 @@ SPELLBOOK = SPELLBOOK_BASE | {
 
     # Music spells -- modify at will. A list will play songs in order.
     '2': Spell([
-        "music/ambiance.mp4"
+        "music/ambiance.mp3"
     ], BARDIC_SPELL),
 
     '3': Spell([
