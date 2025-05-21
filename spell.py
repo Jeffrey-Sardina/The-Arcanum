@@ -14,12 +14,10 @@ TAG_MUSIC_LAYERED = "LAYERED"
 
 class Spell:
     def __init__(self, spell_data, spell_type, tag=TAG_STANDARD):
-        if spell_type == BARDIC_SPELL:
-            if type(spell_data) == str:
-                self.spell_data = [spell_data]
-            else:
-                self.spell_data = spell_data
-                assert tag == TAG_STANDARD, "Music lists cannot only be played in the standard stream"
+        if type(spell_data) == str:
+            self.spell_data = [spell_data]
+        else:
+            self.spell_data = spell_data
         self.spell_type = spell_type
         self.tag = tag
 

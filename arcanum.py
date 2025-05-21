@@ -199,11 +199,11 @@ def arcanum_loop():
 
                 # arcanum commands
                 elif spell_type == FORBIDDEN_SPELL:
-                    if spell_data == 'stop-illusion':
+                    if 'stop-illusion' in spell_data:
                         stop_illusion()
-                    elif spell_data == 'stop-music':
+                    elif 'stop-music' in spell_data:
                         stop_music()
-                    elif spell_data == 'exit':
+                    elif 'exit' in spell_data:
                         exit_arcanum()
             
                 # images

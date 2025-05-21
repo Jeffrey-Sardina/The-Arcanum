@@ -2,5 +2,5 @@
 
 while true
 do
-    python arcanum.py 2 -re
+    python arcanum.py 2 -re -db
 done
