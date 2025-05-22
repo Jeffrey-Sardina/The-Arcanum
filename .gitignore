@@ -1,8 +1,7 @@
-# music
+# music and visuals
 music/*
-
-# images
 images/*
+videos/*
 
 # logs
 logs/*
