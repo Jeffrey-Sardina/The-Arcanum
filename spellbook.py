@@ -45,7 +45,7 @@ SPELLBOOK = SPELLBOOK_BASE | {
         "music/witcher-banana-tiger.mp3"
     ], BARDIC_SPELL), #tag=TAG_MUSIC_LAYERED
 
-    '9': Spell([
+    '10': Spell([
         "music/Baldurs-Gate/07 Baldur's Gate 3 OST - Lead Your Fights (2023_10_28 11_55_15 UTC).mp3",
         "music/Baldurs-Gate/05 Baldur's Gate 3 OST - Nine Blades (2023_10_28 11_55_15 UTC).mp3",
         "music/Baldurs-Gate/03  Baldur's Gate 3 OST - Mind Flayer Theme (2023_10_28 11_55_15 UTC).mp3",

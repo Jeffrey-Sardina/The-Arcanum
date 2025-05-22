@@ -4,6 +4,12 @@ music/*
 # images
 images/*
 
+# logs
+logs/*
+
+# pycache
+__pycache__/*
+
 # ignore ignore
 !.init
 !images/black.png

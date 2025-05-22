@@ -39,7 +39,7 @@ MUSIC CONTROL
 =============
 '''
 def write_file(line):
-    with open('music.cur.txt', 'w') as out:
+    with open('logs/music.cur.txt', 'w') as out:
         print(line, file=out)
 
 def stop_music(streams="All"):
@@ -177,11 +177,13 @@ def arcanum_loop():
 
         _, img = SCRYING_EYE.read()
         try:
-            qr_value, _, _ = QR_LOCATOR.detectAndDecodeCurved(img)
+            qr_value, _, _ = QR_LOCATOR.detectAndDecode(img) #detectAndDecodeCurved
         except:
             qr_value = False
             if debug:
                 raise
+            else:
+                print('error')
         if qr_value:
             if qr_value in SPELLBOOK: 
                 spell = SPELLBOOK[qr_value]
@@ -275,7 +277,7 @@ if __name__ == '__main__':
             debug = True
         if '-re' in sys.argv:
             try:
-                with open('music.cur.txt', 'r') as inp:
+                with open('logs/music.cur.txt', 'r') as inp:
                     restart_file = inp.readlines()[0].strip()
             except:
                 pass
