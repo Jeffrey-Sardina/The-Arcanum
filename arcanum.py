@@ -23,6 +23,8 @@ ILLUSION_ROOT = None
 ILLUSION_CANVAS = None
 CANVAS_W = None
 CANVAS_H = None
+BARD_LOG = 'logs/music.cur.txt'
+ILLUSION_LOG = 'logs/visual.cur.txt'
 
 # global vars
 bard = None
@@ -38,8 +40,12 @@ current_image = None
 MUSIC CONTROL
 =============
 '''
-def write_file(line):
-    with open('logs/music.cur.txt', 'w') as out:
+def write_curr_music(line):
+    with open(BARD_LOG, 'w') as out:
+        print(line, file=out)
+
+def write_cur_display(line):
+    with open(ILLUSION_LOG, 'w') as out:
         print(line, file=out)
 
 def stop_music(streams="All"):
@@ -68,7 +74,7 @@ def play_music(music_file, tag=TAG_STANDARD):
         bard = vlc.MediaPlayer(music_file)
         bard.play()
         current_music = music_file
-        write_file(music_file)
+        write_curr_music(music_file)
     else:
         if music_file == current_music_layered:
             return # dont replay what we already started playing
@@ -128,6 +134,7 @@ def stop_illusion(image_file):
 
 def show_illusion(image_file):
     global current_image, ILLUSION_CONTAINER
+    write_cur_display(image_file)
     if image_file == current_image:
         return # dont redraw what we already are showing
     # https://www.tutorialspoint.com/how-to-update-an-image-in-a-tkinter-canvas
@@ -170,10 +177,14 @@ def arcanum_loop():
         if bard_layered and bard_layered.get_state() == 6: #ended
             stop_music(streams=TAG_MUSIC_LAYERED) #do a reset
 
-        if restart_file:
-            print('restarting', restart_file)
-            play_music(restart_file)
-            restart_file = False
+        if restart_bard_file:
+            print('restarting', restart_bard_file)
+            play_music(restart_bard_file)
+            restart_bard_file = False
+        if restart_illusion_file:
+            print('restarting', restart_illusion_file)
+            show_illusion(restart_illusion_file)
+            restart_illusion_file = False
 
         _, img = SCRYING_EYE.read()
         try:
@@ -258,7 +269,8 @@ def enter_arcanum():
 
 if __name__ == '__main__':
     debug = False
-    restart_file = False
+    restart_bard_file = False
+    restart_illusion_file = False
 
     try:
         # command line args
@@ -277,8 +289,13 @@ if __name__ == '__main__':
             debug = True
         if '-re' in sys.argv:
             try:
-                with open('logs/music.cur.txt', 'r') as inp:
-                    restart_file = inp.readlines()[0].strip()
+                with open(BARD_LOG, 'r') as inp:
+                    restart_bard_file = inp.readlines()[0].strip()
+            except:
+                pass
+            try:
+                with open(ILLUSION_LOG, 'r') as inp:
+                    restart_illusion_file = inp.readlines()[0].strip()
             except:
                 pass
 
