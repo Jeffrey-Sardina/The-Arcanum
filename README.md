@@ -9,11 +9,11 @@ The Arcanum is a set of hands-off, automated TTRPG tools for music and display m
 The idea is to manage visual and auditory ambiance (that is, music and projections) from a single place. This manages all commands from QR codes, meaning that in session you never have to touch a computer to use it.
 
 This can be done, for example, with:
-- qr codes printed in a fancy notebook (don't let your players see the codes -- make them think it's magic!)
-- a computer or Raspberry Pi for the control module
-- HDMI connection from the Pi to a projector or screen (for visual effects / ambiance)
-- Bluetooth or Aux connection from the Pi to a speaker (for music / ambient sound)
-- a cheap webcam connected by USB to the computer / Raspberry Pi (to see and respond to QR codes)
+    - qr codes printed in a fancy notebook (don't let your players see the codes -- make them think it's magic!)
+    - a computer or Raspberry Pi for the control module
+    - HDMI connection from the Pi to a projector or screen (for visual effects / ambiance)
+    - Bluetooth or Aux connection from the Pi to a speaker (for music / ambient sound)
+    - a cheap webcam connected by USB to the computer / Raspberry Pi (to see and respond to QR codes)
 
 In all cases, default I/O is used -- so any of the above can we swapped out as long as your default webcam / sound / display is what you want the Arcanum to use.
 
@@ -21,17 +21,19 @@ In all cases, default I/O is used -- so any of the above can we swapped out as l
 ## Using the Arcanum
 The easiest way to use the Arcanum is via the command `./arcanum.sh`, which will begin the Arcanum using your default camera and display device. If this is not what you want, however, then keep reading!
 
-Command-line args for `arcanum.py`. The first is the ID of your webcam (if you only have one webcam, it will be automatically loaded and no ID need be specified). That means you can run this as `python arcanum.py 0` in almost all use cases (on some linux / MacOS versions, you might need to type python3, rather than python). You can further specify `-db` to enter into debug mode and `-re` to ask the Arcanum to resume your last-played music and image/video.
+Command-line args for `arcanum.py` are as follows. The first is the ID of your webcam (if you only have one webcam, it will be automatically loaded and no ID need be specified). That means you can run this as `python arcanum.py 0` in almost all use cases (on some linux / MacOS versions, you might need to type python3, rather than python). You can further specify `-db` to enter into debug mode and `-re` to ask the Arcanum to resume your last-played music and image/video.
+    - NOTE: if you run arcanum.py from the command line, it is **highly suggested** that you also run python -m keep_presence. This will keep the webcam from timing out and crashing the Arcanum -- without that, you are **much** more likely to have the music and display randomly stop after 5-10 minutes.
+    - Instead of running from the command line, I suggest you modify the Arcanum command in ./arcanum.sh as needed.
 
-Hard-coded actions in `spellbook.py`. These are called "Spells" and are created using the `Spell` class (examples are given in that file). The Spellbook maps text to some sort of action -- note that the text is the value read off the QR code by the camera! There are three types of spells: 
+Mappings of QR codes to music / displays are in `spellbook.py`. These are called "Spells" and are created using the `Spell` class (examples are given in that file). The Spellbook maps text to some sort of action -- note that the text is the value read off the QR code by the camera! There are three types of spells: 
     - FORBIDDEN_SPELL -- these are ones I use for special purposes (like closing the program). THere should be no need for you to never change them, though you might want to create QR codes for them.
     - BARDIC_SPELL -- contains a path to a music file. That file will be played if this command is given. This file must be on your computer (not, for example, on youtube -- for the moment at least).
     - ILLUSION_SPELL -- contains a path to an image file. That file will be displayed if this command is given. This file must be on your computer, not a link to a file online.
 
 You may also want to tag a spell with TAG_MUSIC_LAYERED to play it as a sound effect. Music played this way
-- does not repeat (most music will by default)
-- can be played at the same time as "regular" music
-- is intended to be mainly used for sound effects (like a door closing), but can be used for anything you'd like!
+    - does not repeat (most music will by default)
+    - can be played at the same time as "regular" music
+    - is intended to be mainly used for sound effects (like a door closing), but can be used for anything you'd like!
 
 Define all the mappings you want, run Arcanum, and there you go! Just show it QR codes for each of your spells, and it will "cast" them for you!
 
@@ -64,7 +66,9 @@ When run via ./arcanum.sh, all logs can be found at:
 
 If run via python on the terminal, these will be printed to the terminal (to STDOUT and STDERR, in turn).
 
-PLease note that **the #1 cause of error** in my experience is the computer being idle, which leads to the webcam being deactivated / going to sleep etc. I'm still working for a way around this, and will update when I have one!
+PLease note that **the #1 cause of error** in my experience is the computer being idle, which leads to the webcam being deactivated / going to sleep etc. This *should* be fixed if you run `python -m keep_presence` when you begin the Arcanum (this is done by default in `arcanum.sh`).
+
+If you have an error, please open an issue. If you encounter an error and fix it, please open a pull request and I'd be happy to integrate it!
 
 
 ## Useful References

@@ -1,0 +1,3 @@
+CC BY 4.0
+
+The Arcanum is available under a CC BY 4.0 license. For full license details, see: https://creativecommons.org/licenses/by/4.0/. If you raise a pull request, you must agree to your changes being available under this license.
