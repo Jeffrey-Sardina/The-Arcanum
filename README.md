@@ -57,6 +57,16 @@ On top of that, you'll need to install VLC: `sudo apt-get install vlc` as this p
 I'm using Python 3.7 for legacy use -- but this code should run on basically any Python 3.X. Currently I have only tested on Linux, but in theory a python 3.7 environment with all requirements installed, and VLC (https://www.videolan.org/vlc/) downloaded, *should* work on any OS.
 
 
+## Dealing with Errors
+When run via ./arcanum.sh, all logs can be found at:
+- logs/arcanum.cmd.log (for commands it was given)
+- logs/arcanum.err.log (for errors it had)
+
+If run via python on the terminal, these will be printed to the terminal (to STDOUT and STDERR, in turn).
+
+PLease note that **the #1 cause of error** in my experience is the computer being idle, which leads to the webcam being deactivated / going to sleep etc. I'm still working for a way around this, and will update when I have one!
+
+
 ## Useful References
 1. https://stackoverflow.com/questions/47316266/can-i-display-image-in-full-screen-mode-with-pil
 2. https://stackoverflow.com/questions/20021457/playing-mp3-song-on-python
