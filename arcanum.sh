@@ -1,3 +1,4 @@
 #! /bin/bash
 
-python -u arcanum.py -db &> logs/err.log
+cam_id=$1
+python -u arcanum.py $cam_id -db 1> logs/arcanum.cmd.log 2> arcanum.err.log
