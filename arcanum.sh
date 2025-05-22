@@ -1,3 +1,3 @@
 #! /bin/bash
 
-python arcanum.py -db &> err.log
+python -u arcanum.py -db &> logs/err.log

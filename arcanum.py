@@ -162,7 +162,7 @@ def exit_arcanum():
     exit(0)
 
 def arcanum_loop():
-    global music_queue, current_music, restart_file
+    global music_queue, current_music, restart_bard_file, restart_illusion_file
     try:
         if bard and bard.get_state() == 6: #ended
             if len(music_queue) > 0:
